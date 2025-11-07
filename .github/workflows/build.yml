@@ -11,7 +11,7 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: Install dependencies
       run: |
@@ -77,7 +77,7 @@ jobs:
         make -j$(nproc) V=s
     
     - name: Upload firmware
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: openwrt-firmware
         path: openwrt/bin/targets/ramips/mt76x8/*sysupgrade.bin
