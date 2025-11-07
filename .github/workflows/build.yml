@@ -41,35 +41,61 @@ jobs:
     - name: Configure
       run: |
         cd openwrt
-        cat > .config << EOF
+        cat > .config << 'EOF'
         CONFIG_TARGET_ramips=y
         CONFIG_TARGET_ramips_mt76x8=y
         CONFIG_TARGET_ramips_mt76x8_DEVICE_xiaomi_mi-router-4c=y
+
+        # --- USB ---
         CONFIG_PACKAGE_kmod-usb-core=y
         CONFIG_PACKAGE_kmod-usb-ohci=y
         CONFIG_PACKAGE_kmod-usb-ehci=y
         CONFIG_PACKAGE_kmod-usb2=y
         CONFIG_PACKAGE_kmod-usb-storage=y
+        CONFIG_PACKAGE_kmod-usb-storage-extras=y
         CONFIG_PACKAGE_kmod-scsi-core=y
+        CONFIG_PACKAGE_usbutils=y
+
+        # --- Файловые системы ---
         CONFIG_PACKAGE_kmod-fs-ext4=y
         CONFIG_PACKAGE_kmod-fs-vfat=y
+        CONFIG_PACKAGE_kmod-fs-exfat=y
+        CONFIG_PACKAGE_kmod-fs-ntfs=y
+        CONFIG_PACKAGE_kmod-fuse=y
+        CONFIG_PACKAGE_ntfs-3g=y
         CONFIG_PACKAGE_kmod-nls-base=y
         CONFIG_PACKAGE_kmod-nls-cp437=y
         CONFIG_PACKAGE_kmod-nls-iso8859-1=y
         CONFIG_PACKAGE_kmod-nls-utf8=y
+
+        # --- Swap ---
+        CONFIG_SWAP=y
+        CONFIG_PACKAGE_kmod-swap=y
+        CONFIG_PACKAGE_swap-utils=y
+        CONFIG_PACKAGE_kmod-loop=y
+        CONFIG_PACKAGE_zram-swap=y
+
+        # --- Базовые утилиты ---
+        CONFIG_PACKAGE_mount-utils=y
+        CONFIG_PACKAGE_fstools=y
         CONFIG_PACKAGE_block-mount=y
+        CONFIG_PACKAGE_blockd=y
+        CONFIG_PACKAGE_lsblk=y
+        CONFIG_PACKAGE_parted=y
         CONFIG_PACKAGE_e2fsprogs=y
         CONFIG_PACKAGE_fdisk=y
+
+        # --- LuCI и Travelmate ---
         CONFIG_PACKAGE_luci=y
         CONFIG_PACKAGE_luci-ssl=y
         CONFIG_PACKAGE_luci-app-travelmate=y
         CONFIG_PACKAGE_luci-i18n-base-ru=y
         CONFIG_PACKAGE_luci-i18n-firewall-ru=y
         CONFIG_PACKAGE_travelmate=y
-        CONFIG_PACKAGE_usbutils=y
         CONFIG_PACKAGE_curl=y
         EOF
         make defconfig
+
     
     - name: Build
       run: |
