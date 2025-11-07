@@ -1,10 +1,8 @@
-name: Build OpenWrt with USB
-
+name: Build OpenWrt with USB and SWAP
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -45,7 +43,11 @@ jobs:
         CONFIG_TARGET_ramips=y
         CONFIG_TARGET_ramips_mt76x8=y
         CONFIG_TARGET_ramips_mt76x8_DEVICE_xiaomi_mi-router-4c=y
-
+        
+        # === KERNEL SWAP SUPPORT ===
+        CONFIG_KERNEL_SWAP=y
+        CONFIG_KERNEL_SWAP_WORKINGSET=y
+        
         # --- USB ---
         CONFIG_PACKAGE_kmod-usb-core=y
         CONFIG_PACKAGE_kmod-usb-ohci=y
@@ -55,7 +57,7 @@ jobs:
         CONFIG_PACKAGE_kmod-usb-storage-extras=y
         CONFIG_PACKAGE_kmod-scsi-core=y
         CONFIG_PACKAGE_usbutils=y
-
+        
         # --- Файловые системы ---
         CONFIG_PACKAGE_kmod-fs-ext4=y
         CONFIG_PACKAGE_kmod-fs-vfat=y
@@ -67,14 +69,12 @@ jobs:
         CONFIG_PACKAGE_kmod-nls-cp437=y
         CONFIG_PACKAGE_kmod-nls-iso8859-1=y
         CONFIG_PACKAGE_kmod-nls-utf8=y
-
-        # --- Swap ---
+        
+        # --- Swap поддержка ---
         CONFIG_SWAP=y
-        CONFIG_PACKAGE_kmod-swap=y
         CONFIG_PACKAGE_swap-utils=y
-        CONFIG_PACKAGE_kmod-loop=y
         CONFIG_PACKAGE_zram-swap=y
-
+        
         # --- Базовые утилиты ---
         CONFIG_PACKAGE_mount-utils=y
         CONFIG_PACKAGE_fstools=y
@@ -84,7 +84,7 @@ jobs:
         CONFIG_PACKAGE_parted=y
         CONFIG_PACKAGE_e2fsprogs=y
         CONFIG_PACKAGE_fdisk=y
-
+        
         # --- LuCI и Travelmate ---
         CONFIG_PACKAGE_luci=y
         CONFIG_PACKAGE_luci-ssl=y
@@ -95,7 +95,12 @@ jobs:
         CONFIG_PACKAGE_curl=y
         EOF
         make defconfig
-
+    
+    - name: Verify SWAP config
+      run: |
+        cd openwrt
+        echo "=== Checking SWAP configuration ==="
+        grep -i swap .config || echo "No SWAP config found!"
     
     - name: Build
       run: |
@@ -105,5 +110,5 @@ jobs:
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
-        name: openwrt-firmware
+        name: openwrt-firmware-usb-swap
         path: openwrt/bin/targets/ramips/mt76x8/*sysupgrade.bin
